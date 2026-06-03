@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synthzer Preset Cloud</title>
+    <!-- Подключение Bootstrap 5 для стандартной и аккуратной верстки -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .navbar {
+            background-color: #212529;
+        }
+        .hero-section {
+            background-color: #ffffff;
+            border-bottom: 1px solid #dee2e6;
+            padding: 40px 0;
+            margin-bottom: 30px;
+        }
+        .preset-xml-view {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.85rem;
+            background-color: #f8f9fa;
+        }
+        /* Стили для таблицы, чтобы выглядело как стандартный интерфейс администрирования */
+        .table-hover tbody tr:hover {
+            background-color: #f1f3f5;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Навигационная панель -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Synthzer Preset Cloud</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#hero">Главная</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#presets-section">Пресеты</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://github.com/viktir12/DualOscSynth_release/tree/master" target="_blank">GitHub репозиторий</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Информационный блок (Hero) -->
+    <section id="hero" class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-5 fw-bold">Virtual Analog Synthesizer</h1>
+            <p class="lead text-muted mt-3">
+                Платформа для хранения и обмена пресетами виртуального аналогового синтезатора 
+                с двумя осцилляторами. Поддерживает формат XML.
+            </p>
+            <a href="/download/synth" class="btn btn-primary btn-lg mt-3">Скачать dualoscsynth.zip</a>
+        </div>
+    </section>
+
+    <!-- Основной раздел управления пресетами -->
+    <section id="presets-section" class="container mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Библиотека пресетов</h2>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addPresetModal">
+                + Добавить пресет
+            </button>
+        </div>
+
+        <!-- Панель фильтров -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Поиск по названию или автору...">
+                    </div>
+                    <div class="col-md-4">
+                        <select id="categorySelect" class="form-select">
+                            <option value="">Все категории</option>
+                            <option value="Bass">Bass</option>
+                            <option value="Lead">Lead</option>
+                            <option value="Pad">Pad</option>
+                            <option value="Pluck">Pluck</option>
+                            <option value="FX">FX</option>
+                            <option value="General">General</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Таблица с данными -->
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col" style="width: 30%;">Название</th>
+                                <th scope="col" style="width: 20%;">Автор</th>
+                                <th scope="col" style="width: 15%;">Категория</th>
+                                <th scope="col" style="width: 20%;">Дата создания</th>
+                                <th scope="col" style="width: 15%;" class="text-end">Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="presetsTableBody">
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">Загрузка данных...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Модальное окно: Добавление пресета -->
+    <div class="modal fade" id="addPresetModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавление нового пресета</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="presetForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="presetName" class="form-label">Название *</label>
+                            <input type="text" class="form-control" id="presetName" required>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="presetAuthor" class="form-label">Автор</label>
+                                <input type="text" class="form-control" id="presetAuthor">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="presetCategory" class="form-label">Категория</label>
+                                <select class="form-select" id="presetCategory">
+                                    <option value="General" selected>General</option>
+                                    <option value="Bass">Bass</option>
+                                    <option value="Lead">Lead</option>
+                                    <option value="Pad">Pad</option>
+                                    <option value="Pluck">Pluck</option>
+                                    <option value="FX">FX</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="presetFile" class="form-label">Загрузить XML-файл</label>
+                            <input type="file" class="form-control" id="presetFile" accept=".xml">
+                            <div class="form-text">Или вставьте содержимое XML вручную в поле ниже.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="presetXml" class="form-label">Содержимое XML</label>
+                            <textarea class="form-control preset-xml-view" id="presetXml" rows="6" placeholder="<preset>...</preset>"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn btn-primary" id="savePresetBtn">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно: Просмотр пресета -->
+    <div class="modal fade" id="viewPresetModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewPresetTitle">Просмотр пресета</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <small class="text-muted">Автор: <span id="viewPresetAuthor" class="fw-bold"></span> | Категория: <span id="viewPresetCategory"></span></small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">XML-код пресета:</label>
+                        <textarea class="form-control preset-xml-view" id="viewPresetXml" rows="8" readonly></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" onclick="copyXmlToClipboard()">Копировать XML</button>
+                    <button type="button" class="btn btn-primary" id="downloadViewBtn">Скачать файл</button>
+                    <button type="button" class="btn btn-danger" id="deleteViewBtn">Удалить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Подключение Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Основная логика приложения -->
+    <script>
+        let currentPresetId = null;
+        let searchTimeout = null;
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPresets();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Дебаунс для поиска (задержка 500 мс для снижения нагрузки на сервер)
+            document.getElementById('searchInput').addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(loadPresets, 500);
+            });
+
+            document.getElementById('categorySelect').addEventListener('change', loadPresets);
+
+            // Обработка отправки формы
+            document.getElementById('presetForm').addEventListener('submit', handleFormSubmit);
+
+            // Автоматическое чтение файла в textarea при выборе
+            document.getElementById('presetFile').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        document.getElementById('presetXml').value = event.target.result;
+                    };
+                    reader.readAsText(file);
+                }
+            });
+        }
+
+        // Функция получения списка пресетов с сервера
+        async function loadPresets() {
+            const tbody = document.getElementById('presetsTableBody');
+            const search = document.getElementById('searchInput').value.trim();
+            const category = document.getElementById('categorySelect').value;
+
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Загрузка данных...</td></tr>';
+
+            try {
+                const params = new URLSearchParams();
+                if (search) params.append('search', search);
+                if (category) params.append('category', category);
+
+                const response = await fetch(`/presets?${params.toString()}`);
+                if (!response.ok) throw new Error('Ошибка сервера');
+                
+                const presets = await response.json();
+                renderTable(presets);
+            } catch (error) {
+                console.error('Ошибка загрузки:', error);
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger">Ошибка загрузки данных. Проверьте подключение к серверу.</td></tr>';
+            }
+        }
+
+        // Отрисовка таблицы
+        function renderTable(presets) {
+            const tbody = document.getElementById('presetsTableBody');
+            tbody.innerHTML = '';
+
+            if (presets.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Пресеты не найдены</td></tr>';
+                return;
+            }
+
+            presets.forEach(preset => {
+                const date = new Date(preset.created_at).toLocaleDateString('ru-RU');
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="fw-medium">${escapeHtml(preset.name)}</td>
+                    <td>${escapeHtml(preset.author || 'Не указан')}</td>
+                    <td><span class="badge bg-secondary">${escapeHtml(preset.category)}</span></td>
+                    <td class="text-muted small">${date}</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="viewPreset(${preset.id})">Просмотр</button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deletePreset(${preset.id})">Удалить</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Обработка отправки формы добавления
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('savePresetBtn');
+            btn.disabled = true;
+            btn.textContent = 'Сохранение...';
+
+            const name = document.getElementById('presetName').value;
+            const author = document.getElementById('presetAuthor').value;
+            const category = document.getElementById('presetCategory').value;
+            const fileInput = document.getElementById('presetFile');
+            const xmlText = document.getElementById('presetXml').value;
+
+            try {
+                if (fileInput.files.length > 0) {
+                    // Отправка как multipart/form-data
+                    const formData = new FormData();
+                    formData.append('name', name);
+                    formData.append('author', author);
+                    formData.append('category', category);
+                    formData.append('file', fileInput.files[0]);
+
+                    const response = await fetch('/presets/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    if (!response.ok) {
+                        const err = await response.json();
+                        throw new Error(err.detail || 'Ошибка загрузки файла');
+                    }
+                } else {
+                    // Отправка как JSON
+                    if (!xmlText.trim()) throw new Error('Необходимо загрузить файл или ввести XML-код');
+                    
+                    const response = await fetch('/presets', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, author, category, preset_xml: xmlText })
+                    });
+                    if (!response.ok) {
+                        const err = await response.json();
+                        throw new Error(err.detail || 'Ошибка сохранения');
+                    }
+                }
+
+                // Успешное сохранение
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addPresetModal'));
+                modal.hide();
+                document.getElementById('presetForm').reset();
+                loadPresets();
+                alert('Пресет успешно добавлен');
+            } catch (error) {
+                alert('Ошибка: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Сохранить';
+            }
+        }
+
+        // Просмотр конкретного пресета
+        async function viewPreset(id) {
+            currentPresetId = id;
+            try {
+                const response = await fetch(`/presets/${id}`);
+                if (!response.ok) throw new Error('Пресет не найден');
+                
+                const preset = await response.json();
+                
+                document.getElementById('viewPresetTitle').textContent = preset.name;
+                document.getElementById('viewPresetAuthor').textContent = preset.author || 'Не указан';
+                document.getElementById('viewPresetCategory').textContent = preset.category;
+                document.getElementById('viewPresetXml').value = preset.preset_xml || 'Данные отсутствуют';
+
+                // Привязка действий к кнопкам в модальном окне
+                document.getElementById('downloadViewBtn').onclick = () => downloadPreset(id, preset.name);
+                document.getElementById('deleteViewBtn').onclick = () => {
+                    deletePreset(id);
+                    bootstrap.Modal.getInstance(document.getElementById('viewPresetModal')).hide();
+                };
+
+                const modal = new bootstrap.Modal(document.getElementById('viewPresetModal'));
+                modal.show();
+            } catch (error) {
+                alert('Ошибка загрузки данных: ' + error.message);
+            }
+        }
+
+        // Скачивание файла пресета
+        function downloadPreset(id, name) {
+            const a = document.createElement('a');
+            a.href = `/presets/${id}/download`;
+            a.download = `${name}.xml`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // Удаление пресета
+        async function deletePreset(id) {
+            if (!confirm('Вы уверены, что хотите удалить этот пресет? Это действие нельзя отменить.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/presets/${id}`, { method: 'DELETE' });
+                if (!response.ok) throw new Error('Ошибка при удалении');
+                
+                loadPresets();
+            } catch (error) {
+                alert('Ошибка: ' + error.message);
+            }
+        }
+
+        // Утилита: копирование в буфер обмена
+        function copyXmlToClipboard() {
+            const textarea = document.getElementById('viewPresetXml');
+            textarea.select();
+            document.execCommand('copy');
+            alert('XML-код скопирован в буфер обмена');
+        }
+
+        // Утилита: защита от XSS при выводе данных
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
