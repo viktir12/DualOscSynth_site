@@ -4,76 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synthzer Preset Cloud</title>
-    <!-- Подключение Bootstrap 5 для стандартной и аккуратной верстки -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Подключаем Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-        .navbar {
-            background-color: #212529;
-        }
-        .hero-section {
-            background-color: #ffffff;
-            border-bottom: 1px solid #dee2e6;
-            padding: 40px 0;
-            margin-bottom: 30px;
-        }
-        .preset-xml-view {
-            font-family: "Courier New", Courier, monospace;
-            font-size: 0.85rem;
-            background-color: #f8f9fa;
-        }
-        /* Стили для таблицы, чтобы выглядело как стандартный интерфейс администрирования */
-        .table-hover tbody tr:hover {
-            background-color: #f1f3f5;
-        }
+        body { background-color: #f8f9fa; }
+        .navbar { background-color: #212529; }
+        .hero-section { background-color: #ffffff; border-bottom: 1px solid #dee2e6; padding: 40px 0; margin-bottom: 30px; }
+        .preset-xml-view { font-family: "Courier New", monospace; font-size: 0.85rem; background-color: #f8f9fa; }
     </style>
 </head>
 <body>
 
-    <!-- Навигационная панель -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand" href="#">Synthzer Preset Cloud</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#hero">Главная</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#presets-section">Пресеты</a></li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://github.com/viktir12/DualOscSynth_release/tree/master" target="_blank">GitHub репозиторий</a>
-                    </li>
-                </ul>
-            </div>
         </div>
     </nav>
 
-    <!-- Информационный блок (Hero) -->
-    <section id="hero" class="hero-section text-center">
+    <section class="hero-section text-center">
         <div class="container">
             <h1 class="display-5 fw-bold">Virtual Analog Synthesizer</h1>
-            <p class="lead text-muted mt-3">
-                Платформа для хранения и обмена пресетами виртуального аналогового синтезатора 
-                с двумя осцилляторами. Поддерживает формат XML.
-            </p>
-            <a href="/download/synth" class="btn btn-primary btn-lg mt-3">Скачать dualoscsynth.zip</a>
+            <p class="lead text-muted mt-3">Платформа для хранения пресетов синтезатора</p>
+            <a href="dualoscsynth.zip" class="btn btn-primary btn-lg mt-3" download>Скачать dualoscsynth.zip</a>
         </div>
     </section>
 
-    <!-- Основной раздел управления пресетами -->
-    <section id="presets-section" class="container mb-5">
+    <section class="container mb-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Библиотека пресетов</h2>
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addPresetModal">
-                + Добавить пресет
-            </button>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addPresetModal">+ Добавить пресет</button>
         </div>
 
-        <!-- Панель фильтров -->
         <div class="card mb-4">
             <div class="card-body">
                 <div class="row g-3">
@@ -95,24 +57,21 @@
             </div>
         </div>
 
-        <!-- Таблица с данными -->
         <div class="card">
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0 align-middle">
                         <thead class="table-light">
                             <tr>
-                                <th scope="col" style="width: 30%;">Название</th>
-                                <th scope="col" style="width: 20%;">Автор</th>
-                                <th scope="col" style="width: 15%;">Категория</th>
-                                <th scope="col" style="width: 20%;">Дата создания</th>
-                                <th scope="col" style="width: 15%;" class="text-end">Действия</th>
+                                <th style="width: 30%;">Название</th>
+                                <th style="width: 20%;">Автор</th>
+                                <th style="width: 15%;">Категория</th>
+                                <th style="width: 20%;">Дата</th>
+                                <th style="width: 15%;" class="text-end">Действия</th>
                             </tr>
                         </thead>
                         <tbody id="presetsTableBody">
-                            <tr>
-                                <td colspan="5" class="text-center py-4 text-muted">Загрузка данных...</td>
-                            </tr>
+                            <tr><td colspan="5" class="text-center py-4 text-muted">Загрузка...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -120,29 +79,29 @@
         </div>
     </section>
 
-    <!-- Модальное окно: Добавление пресета -->
-    <div class="modal fade" id="addPresetModal" tabindex="-1" aria-hidden="true">
+    <!-- Modal: Add Preset -->
+    <div class="modal fade" id="addPresetModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Добавление нового пресета</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
                 <form id="presetForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Новый пресет</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="presetName" class="form-label">Название *</label>
-                            <input type="text" class="form-control" id="presetName" required>
+                            <label class="form-label">Название *</label>
+                            <input type="text" id="presetName" class="form-control" required>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label for="presetAuthor" class="form-label">Автор</label>
-                                <input type="text" class="form-control" id="presetAuthor">
+                                <label class="form-label">Автор</label>
+                                <input type="text" id="presetAuthor" class="form-control">
                             </div>
                             <div class="col-md-6">
-                                <label for="presetCategory" class="form-label">Категория</label>
-                                <select class="form-select" id="presetCategory">
-                                    <option value="General" selected>General</option>
+                                <label class="form-label">Категория</label>
+                                <select id="presetCategory" class="form-select">
+                                    <option value="General">General</option>
                                     <option value="Bass">Bass</option>
                                     <option value="Lead">Lead</option>
                                     <option value="Pad">Pad</option>
@@ -152,268 +111,246 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="presetFile" class="form-label">Загрузить XML-файл</label>
-                            <input type="file" class="form-control" id="presetFile" accept=".xml">
-                            <div class="form-text">Или вставьте содержимое XML вручную в поле ниже.</div>
+                            <label class="form-label">XML файл</label>
+                            <input type="file" id="presetFile" class="form-control" accept=".xml">
                         </div>
                         <div class="mb-3">
-                            <label for="presetXml" class="form-label">Содержимое XML</label>
-                            <textarea class="form-control preset-xml-view" id="presetXml" rows="6" placeholder="<preset>...</preset>"></textarea>
+                            <label class="form-label">Или XML код</label>
+                            <textarea id="presetXml" class="form-control preset-xml-view" rows="6"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                        <button type="submit" class="btn btn-primary" id="savePresetBtn">Сохранить</button>
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Модальное окно: Просмотр пресета -->
-    <div class="modal fade" id="viewPresetModal" tabindex="-1" aria-hidden="true">
+    <!-- Modal: View Preset -->
+    <div class="modal fade" id="viewPresetModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="viewPresetTitle">Просмотр пресета</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="viewPresetTitle">Просмотр</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <small class="text-muted">Автор: <span id="viewPresetAuthor" class="fw-bold"></span> | Категория: <span id="viewPresetCategory"></span></small>
+                        <small class="text-muted">Автор: <span id="viewPresetAuthor"></span> | Категория: <span id="viewPresetCategory"></span></small>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">XML-код пресета:</label>
-                        <textarea class="form-control preset-xml-view" id="viewPresetXml" rows="8" readonly></textarea>
-                    </div>
+                    <textarea id="viewPresetXml" class="form-control preset-xml-view" rows="8" readonly></textarea>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" onclick="copyXmlToClipboard()">Копировать XML</button>
-                    <button type="button" class="btn btn-primary" id="downloadViewBtn">Скачать файл</button>
-                    <button type="button" class="btn btn-danger" id="deleteViewBtn">Удалить</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="copyXml()">Копировать</button>
+                    <button type="button" class="btn btn-primary" id="downloadBtn">Скачать</button>
+                    <button type="button" class="btn btn-danger" id="deleteBtn">Удалить</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Подключение Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Основная логика приложения -->
     <script>
+        // ========== НАСТРОЙКИ SUPABASE ==========
+        // ЗАМЕНИТЕ НА ВАШИ ЗНАЧЕНИЯ!
+        const SUPABASE_URL = 'https://uofunrnmwkddijrosqaq.supabase.co/rest/v1/';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvZnVucm5td2tkZGlqcm9zcWFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0OTI2MDAsImV4cCI6MjA5NjA2ODYwMH0.FkDwlrshjvq6MF9v67xO1cxtSWRXorrPg45iDt8Z0tI';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let currentPresetId = null;
-        let searchTimeout = null;
 
-        // Инициализация при загрузке страницы
-        document.addEventListener('DOMContentLoaded', () => {
-            loadPresets();
-            setupEventListeners();
-        });
-
-        function setupEventListeners() {
-            // Дебаунс для поиска (задержка 500 мс для снижения нагрузки на сервер)
-            document.getElementById('searchInput').addEventListener('input', () => {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(loadPresets, 500);
-            });
-
-            document.getElementById('categorySelect').addEventListener('change', loadPresets);
-
-            // Обработка отправки формы
-            document.getElementById('presetForm').addEventListener('submit', handleFormSubmit);
-
-            // Автоматическое чтение файла в textarea при выборе
-            document.getElementById('presetFile').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        document.getElementById('presetXml').value = event.target.result;
-                    };
-                    reader.readAsText(file);
-                }
-            });
-        }
-
-        // Функция получения списка пресетов с сервера
+        // ========== ЗАГРУЗКА ПРЕСЕТОВ ==========
         async function loadPresets() {
             const tbody = document.getElementById('presetsTableBody');
             const search = document.getElementById('searchInput').value.trim();
             const category = document.getElementById('categorySelect').value;
 
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Загрузка данных...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Загрузка...</td></tr>';
 
-            try {
-                const params = new URLSearchParams();
-                if (search) params.append('search', search);
-                if (category) params.append('category', category);
-
-                const response = await fetch(`/presets?${params.toString()}`);
-                if (!response.ok) throw new Error('Ошибка сервера');
-                
-                const presets = await response.json();
-                renderTable(presets);
-            } catch (error) {
-                console.error('Ошибка загрузки:', error);
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger">Ошибка загрузки данных. Проверьте подключение к серверу.</td></tr>';
+            let query = supabase.from('presets').select('*');
+            
+            if (search) {
+                query = query.or(`name.ilike.%${search}%,author.ilike.%${search}%`);
             }
-        }
+            if (category) {
+                query = query.eq('category', category);
+            }
+            
+            query = query.order('created_at', { ascending: false });
 
-        // Отрисовка таблицы
-        function renderTable(presets) {
-            const tbody = document.getElementById('presetsTableBody');
-            tbody.innerHTML = '';
+            const { data, error } = await query;
 
-            if (presets.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Пресеты не найдены</td></tr>';
+            if (error) {
+                console.error('Ошибка:', error);
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Ошибка загрузки</td></tr>';
                 return;
             }
 
-            presets.forEach(preset => {
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Пресеты не найдены</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map(preset => {
                 const date = new Date(preset.created_at).toLocaleDateString('ru-RU');
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="fw-medium">${escapeHtml(preset.name)}</td>
-                    <td>${escapeHtml(preset.author || 'Не указан')}</td>
-                    <td><span class="badge bg-secondary">${escapeHtml(preset.category)}</span></td>
-                    <td class="text-muted small">${date}</td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="viewPreset(${preset.id})">Просмотр</button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deletePreset(${preset.id})">Удалить</button>
-                    </td>
+                return `
+                    <tr>
+                        <td class="fw-medium">${escapeHtml(preset.name)}</td>
+                        <td>${escapeHtml(preset.author || '-')}</td>
+                        <td><span class="badge bg-secondary">${preset.category}</span></td>
+                        <td class="text-muted small">${date}</td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-primary" onclick="viewPreset('${preset.id}', ${JSON.stringify(preset).replace(/"/g, '&quot;')})">Просмотр</button>
+                            <button class="btn btn-sm btn-outline-danger ms-1" onclick="deletePreset('${preset.id}')">Удалить</button>
+                        </td>
+                    </tr>
                 `;
-                tbody.appendChild(tr);
-            });
+            }).join('');
         }
 
-        // Обработка отправки формы добавления
-        async function handleFormSubmit(e) {
+        // ========== ДОБАВЛЕНИЕ ПРЕСЕТА ==========
+        document.getElementById('presetForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('savePresetBtn');
-            btn.disabled = true;
-            btn.textContent = 'Сохранение...';
-
+            
             const name = document.getElementById('presetName').value;
             const author = document.getElementById('presetAuthor').value;
             const category = document.getElementById('presetCategory').value;
             const fileInput = document.getElementById('presetFile');
             const xmlText = document.getElementById('presetXml').value;
 
-            try {
-                if (fileInput.files.length > 0) {
-                    // Отправка как multipart/form-data
-                    const formData = new FormData();
-                    formData.append('name', name);
-                    formData.append('author', author);
-                    formData.append('category', category);
-                    formData.append('file', fileInput.files[0]);
+            let filename = null;
+            let presetXml = xmlText;
 
-                    const response = await fetch('/presets/upload', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    if (!response.ok) {
-                        const err = await response.json();
-                        throw new Error(err.detail || 'Ошибка загрузки файла');
-                    }
-                } else {
-                    // Отправка как JSON
-                    if (!xmlText.trim()) throw new Error('Необходимо загрузить файл или ввести XML-код');
-                    
-                    const response = await fetch('/presets', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name, author, category, preset_xml: xmlText })
-                    });
-                    if (!response.ok) {
-                        const err = await response.json();
-                        throw new Error(err.detail || 'Ошибка сохранения');
-                    }
+            // Если выбран файл - загружаем в Storage
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                filename = `${crypto.randomUUID()}.xml`;
+                
+                const { error: uploadError } = await supabase.storage
+                    .from('presets')
+                    .upload(filename, file);
+
+                if (uploadError) {
+                    alert('Ошибка загрузки файла: ' + uploadError.message);
+                    return;
                 }
 
-                // Успешное сохранение
-                const modal = bootstrap.Modal.getInstance(document.getElementById('addPresetModal'));
-                modal.hide();
-                document.getElementById('presetForm').reset();
-                loadPresets();
-                alert('Пресет успешно добавлен');
-            } catch (error) {
-                alert('Ошибка: ' + error.message);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Сохранить';
-            }
-        }
-
-        // Просмотр конкретного пресета
-        async function viewPreset(id) {
-            currentPresetId = id;
-            try {
-                const response = await fetch(`/presets/${id}`);
-                if (!response.ok) throw new Error('Пресет не найден');
-                
-                const preset = await response.json();
-                
-                document.getElementById('viewPresetTitle').textContent = preset.name;
-                document.getElementById('viewPresetAuthor').textContent = preset.author || 'Не указан';
-                document.getElementById('viewPresetCategory').textContent = preset.category;
-                document.getElementById('viewPresetXml').value = preset.preset_xml || 'Данные отсутствуют';
-
-                // Привязка действий к кнопкам в модальном окне
-                document.getElementById('downloadViewBtn').onclick = () => downloadPreset(id, preset.name);
-                document.getElementById('deleteViewBtn').onclick = () => {
-                    deletePreset(id);
-                    bootstrap.Modal.getInstance(document.getElementById('viewPresetModal')).hide();
-                };
-
-                const modal = new bootstrap.Modal(document.getElementById('viewPresetModal'));
-                modal.show();
-            } catch (error) {
-                alert('Ошибка загрузки данных: ' + error.message);
-            }
-        }
-
-        // Скачивание файла пресета
-        function downloadPreset(id, name) {
-            const a = document.createElement('a');
-            a.href = `/presets/${id}/download`;
-            a.download = `${name}.xml`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        // Удаление пресета
-        async function deletePreset(id) {
-            if (!confirm('Вы уверены, что хотите удалить этот пресет? Это действие нельзя отменить.')) {
+                // Читаем содержимое файла
+                presetXml = await file.text();
+            } else if (!presetXml.trim()) {
+                alert('Загрузите файл или введите XML код');
                 return;
             }
 
-            try {
-                const response = await fetch(`/presets/${id}`, { method: 'DELETE' });
-                if (!response.ok) throw new Error('Ошибка при удалении');
-                
-                loadPresets();
-            } catch (error) {
+            // Сохраняем в базу
+            const { error } = await supabase.from('presets').insert({
+                name, author, category, preset_xml: presetXml, filename
+            });
+
+            if (error) {
                 alert('Ошибка: ' + error.message);
+            } else {
+                bootstrap.Modal.getInstance(document.getElementById('addPresetModal')).hide();
+                document.getElementById('presetForm').reset();
+                loadPresets();
+                alert('Пресет сохранен!');
+            }
+        });
+
+        // ========== ПРОСМОТР ПРЕСЕТА ==========
+        function viewPreset(id, preset) {
+            currentPresetId = id;
+            document.getElementById('viewPresetTitle').textContent = preset.name;
+            document.getElementById('viewPresetAuthor').textContent = preset.author || '-';
+            document.getElementById('viewPresetCategory').textContent = preset.category;
+            document.getElementById('viewPresetXml').value = preset.preset_xml || '';
+
+            document.getElementById('downloadBtn').onclick = () => downloadPreset(preset);
+            document.getElementById('deleteBtn').onclick = () => deletePreset(id);
+
+            new bootstrap.Modal(document.getElementById('viewPresetModal')).show();
+        }
+
+        // ========== СКАЧИВАНИЕ ==========
+        async function downloadPreset(preset) {
+            if (preset.filename) {
+                const { data } = supabase.storage.from('presets').getPublicUrl(preset.filename);
+                const a = document.createElement('a');
+                a.href = data.publicUrl;
+                a.download = `${preset.name}.xml`;
+                a.click();
+            } else {
+                // Если файла нет, скачиваем из text
+                const blob = new Blob([preset.preset_xml], { type: 'application/xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${preset.name}.xml`;
+                a.click();
+                URL.revokeObjectURL(url);
             }
         }
 
-        // Утилита: копирование в буфер обмена
-        function copyXmlToClipboard() {
+        // ========== УДАЛЕНИЕ ==========
+        async function deletePreset(id) {
+            if (!confirm('Удалить пресет?')) return;
+
+            // Получаем информацию о файле
+            const { data: preset } = await supabase.from('presets').select('filename').eq('id', id).single();
+            
+            // Удаляем файл из Storage если есть
+            if (preset && preset.filename) {
+                await supabase.storage.from('presets').remove([preset.filename]);
+            }
+
+            // Удаляем из базы
+            const { error } = await supabase.from('presets').delete().eq('id', id);
+            
+            if (error) {
+                alert('Ошибка: ' + error.message);
+            } else {
+                bootstrap.Modal.getInstance(document.getElementById('viewPresetModal')).hide();
+                loadPresets();
+            }
+        }
+
+        // ========== КОПИРОВАНИЕ XML ==========
+        function copyXml() {
             const textarea = document.getElementById('viewPresetXml');
             textarea.select();
             document.execCommand('copy');
-            alert('XML-код скопирован в буфер обмена');
+            alert('Скопировано!');
         }
 
-        // Утилита: защита от XSS при выводе данных
+        // ========== УТИЛИТЫ ==========
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
+
+        // Автозагрузка файла в textarea
+        document.getElementById('presetFile').addEventListener('change', async function(e) {
+            if (e.target.files[0]) {
+                const text = await e.target.files[0].text();
+                document.getElementById('presetXml').value = text;
+            }
+        });
+
+        // Поиск с задержкой
+        let timeout;
+        document.getElementById('searchInput').addEventListener('input', () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(loadPresets, 500);
+        });
+
+        document.getElementById('categorySelect').addEventListener('change', loadPresets);
+
+        // Загрузка при старте
+        loadPresets();
     </script>
 </body>
 </html>
