@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synthzer Preset Cloud</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Подключаем Supabase ТОЛЬКО ОДИН РАЗ -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background-color: #f8f9fa; }
@@ -39,7 +40,7 @@
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-8">
-                    <input type="text" id="searchInput" class="form-control" placeholder="Поиск по названию или автору...">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Поиск...">
                 </div>
                 <div class="col-md-4">
                     <select id="categorySelect" class="form-select">
@@ -62,15 +63,15 @@
                 <table class="table table-hover mb-0 align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th style="width: 30%;">Название</th>
-                            <th style="width: 20%;">Автор</th>
-                            <th style="width: 15%;">Категория</th>
-                            <th style="width: 20%;">Дата</th>
-                            <th style="width: 15%;" class="text-end">Действия</th>
+                            <th>Название</th>
+                            <th>Автор</th>
+                            <th>Категория</th>
+                            <th>Дата</th>
+                            <th class="text-end">Действия</th>
                         </tr>
                     </thead>
                     <tbody id="presetsTableBody">
-                        <tr><td colspan="5" class="text-center py-4 text-muted">Загрузка...</td></tr>
+                        <tr><td colspan="5" class="text-center py-4">Загрузка...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -78,7 +79,7 @@
     </div>
 </section>
 
-<!-- Modal: Add Preset -->
+<!-- Modal Add -->
 <div class="modal fade" id="addPresetModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -127,7 +128,7 @@
     </div>
 </div>
 
-<!-- Modal: View Preset -->
+<!-- Modal View -->
 <div class="modal fade" id="viewPresetModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -152,14 +153,15 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // ========== НАСТРОЙКИ SUPABASE ==========
+    // ========== ОДНОКРАТНАЯ ИНИЦИАЛИЗАЦИЯ SUPABASE ==========
     const SUPABASE_URL = 'https://uofunrnmwkddijrosqaq.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvZnVucm5td2tkZGlqcm9zcWFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0OTI2MDAsImV4cCI6MjA5NjA2ODYwMH0.FkDwlrshjvq6MF9v67xO1cxtSWRXorrPg45iDt8Z0tI';
     
+    // Создаем клиент ТОЛЬКО ОДИН РАЗ
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     let currentPresetId = null;
 
-    // ========== ЗАГРУЗКА ПРЕСЕТОВ ==========
+    // ========== ФУНКЦИИ ==========
     async function loadPresets() {
         const tbody = document.getElementById('presetsTableBody');
         const search = document.getElementById('searchInput').value.trim();
@@ -182,7 +184,7 @@
 
         if (error) {
             console.error('Ошибка:', error);
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Ошибка загрузки: ' + error.message + '</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Ошибка: ' + error.message + '</td></tr>';
             return;
         }
 
@@ -208,7 +210,6 @@
         }).join('');
     }
 
-    // ========== ДОБАВЛЕНИЕ ПРЕСЕТА ==========
     document.getElementById('presetForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         
@@ -254,7 +255,6 @@
         }
     });
 
-    // ========== ПРОСМОТР ПРЕСЕТА ==========
     function viewPreset(id, preset) {
         currentPresetId = id;
         document.getElementById('viewPresetTitle').textContent = preset.name;
@@ -268,7 +268,6 @@
         new bootstrap.Modal(document.getElementById('viewPresetModal')).show();
     }
 
-    // ========== СКАЧИВАНИЕ ==========
     async function downloadPreset(preset) {
         if (preset.filename) {
             const { data } = supabase.storage.from('presets').getPublicUrl(preset.filename);
@@ -287,7 +286,6 @@
         }
     }
 
-    // ========== УДАЛЕНИЕ ==========
     async function deletePreset(id) {
         if (!confirm('Удалить пресет?')) return;
 
@@ -307,7 +305,6 @@
         }
     }
 
-    // ========== КОПИРОВАНИЕ XML ==========
     function copyXml() {
         const textarea = document.getElementById('viewPresetXml');
         textarea.select();
@@ -315,7 +312,6 @@
         alert('Скопировано!');
     }
 
-    // ========== УТИЛИТЫ ==========
     function escapeHtml(text) {
         if (!text) return '';
         const div = document.createElement('div');
@@ -338,6 +334,7 @@
 
     document.getElementById('categorySelect').addEventListener('change', loadPresets);
 
+    // Запуск при загрузке
     loadPresets();
 </script>
 </body>
