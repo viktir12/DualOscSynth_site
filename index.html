@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synthzer Preset Cloud</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Подключаем Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background-color: #f8f9fa; }
@@ -154,7 +153,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // ========== НАСТРОЙКИ SUPABASE ==========
-        // ЗАМЕНИТЕ НА ВАШИ ЗНАЧЕНИЯ!
         const SUPABASE_URL = 'https://uofunrnmwkddijrosqaq.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvZnVucm5td2tkZGlqcm9zcWFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0OTI2MDAsImV4cCI6MjA5NjA2ODYwMH0.FkDwlrshjvq6MF9v67xO1cxtSWRXorrPg45iDt8Z0tI';
         
@@ -223,7 +221,6 @@
             let filename = null;
             let presetXml = xmlText;
 
-            // Если выбран файл - загружаем в Storage
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
                 filename = `${crypto.randomUUID()}.xml`;
@@ -237,14 +234,12 @@
                     return;
                 }
 
-                // Читаем содержимое файла
                 presetXml = await file.text();
             } else if (!presetXml.trim()) {
                 alert('Загрузите файл или введите XML код');
                 return;
             }
 
-            // Сохраняем в базу
             const { error } = await supabase.from('presets').insert({
                 name, author, category, preset_xml: presetXml, filename
             });
@@ -282,7 +277,6 @@
                 a.download = `${preset.name}.xml`;
                 a.click();
             } else {
-                // Если файла нет, скачиваем из text
                 const blob = new Blob([preset.preset_xml], { type: 'application/xml' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -297,15 +291,12 @@
         async function deletePreset(id) {
             if (!confirm('Удалить пресет?')) return;
 
-            // Получаем информацию о файле
             const { data: preset } = await supabase.from('presets').select('filename').eq('id', id).single();
             
-            // Удаляем файл из Storage если есть
             if (preset && preset.filename) {
                 await supabase.storage.from('presets').remove([preset.filename]);
             }
 
-            // Удаляем из базы
             const { error } = await supabase.from('presets').delete().eq('id', id);
             
             if (error) {
@@ -332,7 +323,6 @@
             return div.innerHTML;
         }
 
-        // Автозагрузка файла в textarea
         document.getElementById('presetFile').addEventListener('change', async function(e) {
             if (e.target.files[0]) {
                 const text = await e.target.files[0].text();
@@ -340,7 +330,6 @@
             }
         });
 
-        // Поиск с задержкой
         let timeout;
         document.getElementById('searchInput').addEventListener('input', () => {
             clearTimeout(timeout);
@@ -349,7 +338,6 @@
 
         document.getElementById('categorySelect').addEventListener('change', loadPresets);
 
-        // Загрузка при старте
         loadPresets();
     </script>
 </body>
