@@ -25,7 +25,7 @@
     <div class="container">
         <h1 class="display-5 fw-bold">Virtual Analog Synthesizer</h1>
         <p class="lead text-muted mt-3">Платформа для хранения пресетов синтезатора</p>
-        <a href="DualOscSynth.zip" class="btn btn-primary btn-lg mt-3" download>Скачать DualOscSynth.zip</a>
+    <a href="DualOscSynth.zip" class="btn btn-primary btn-lg mt-3" download>Скачать DualOscSynth.zip</a>
     </div>
 </section>
 
@@ -70,7 +70,6 @@
     </div>
 </section>
 
-<!-- Modal Add -->
 <div class="modal fade" id="addModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -119,7 +118,6 @@
     </div>
 </div>
 
-<!-- Modal View -->
 <div class="modal fade" id="viewModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -150,7 +148,6 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentId = null;
 
-// ========== ЗАГРУЗКА ПРЕСЕТОВ ==========
 async function loadPresets() {
     const tbody = document.getElementById('presetsTable');
     const search = document.getElementById('searchInput').value.trim();
@@ -191,7 +188,6 @@ async function loadPresets() {
     }).join('');
 }
 
-// ========== ДОБАВЛЕНИЕ ПРЕСЕТА ==========
 document.getElementById('presetForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -233,7 +229,6 @@ document.getElementById('presetForm').addEventListener('submit', async (e) => {
     }
 });
 
-// ========== ПРОСМОТР ==========
 function view(id, preset) {
     currentId = id;
     document.getElementById('viewTitle').textContent = preset.name;
@@ -247,7 +242,6 @@ function view(id, preset) {
     new bootstrap.Modal(document.getElementById('viewModal')).show();
 }
 
-// ========== СКАЧИВАНИЕ ==========
 async function download(preset) {
     if (preset.filename) {
         const { data } = supabase.storage.from('presets').getPublicUrl(preset.filename);
@@ -266,7 +260,6 @@ async function download(preset) {
     }
 }
 
-// ========== УДАЛЕНИЕ ==========
 async function del(id) {
     if (!confirm('Удалить пресет?')) return;
     
@@ -284,7 +277,6 @@ async function del(id) {
     }
 }
 
-// ========== КОПИРОВАНИЕ XML ==========
 function copyXml() {
     const ta = document.getElementById('viewXml');
     ta.select();
@@ -292,7 +284,6 @@ function copyXml() {
     alert('XML скопирован!');
 }
 
-// ========== УТИЛИТЫ ==========
 function escapeHtml(text) {
     if (!text) return '';
     const div = document.createElement('div');
@@ -314,7 +305,6 @@ document.getElementById('searchInput').addEventListener('input', () => {
 
 document.getElementById('categorySelect').addEventListener('change', loadPresets);
 
-// Загрузка при старте
 loadPresets();
 </script>
 </body>
